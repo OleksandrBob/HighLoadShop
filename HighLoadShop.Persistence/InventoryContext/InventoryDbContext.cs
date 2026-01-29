@@ -1,0 +1,40 @@
+using HighLoadShop.Domain.InventoryContext.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace HighLoadShop.Persistence.InventoryContext;
+
+public class InventoryDbContext : DbContext
+{
+    public InventoryDbContext(DbContextOptions<InventoryDbContext> options) : base(options)
+    {
+    }
+
+    public DbSet<InventoryItem> InventoryItems { get; set; }
+    public DbSet<Reservation> Reservations { get; set; }
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(InventoryDbContext).Assembly);
+        
+        // Configure InventoryItem entity
+        modelBuilder.Entity<InventoryItem>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.ProductId).IsRequired();
+            entity.Property(e => e.TotalQuantity).IsRequired();
+            entity.Property(e => e.ReservedQuantity).IsRequired();
+            
+            entity.HasIndex(e => e.ProductId).IsUnique();
+        });
+
+        // Configure Reservation entity
+        modelBuilder.Entity<Reservation>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.OrderId).IsRequired();
+            entity.Property(e => e.ProductId).IsRequired();
+            entity.Property(e => e.Quantity).IsRequired();
+            entity.Property(e => e.ExpiresAt).IsRequired();
+        });
+    }
+}

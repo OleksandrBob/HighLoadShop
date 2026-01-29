@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="HighLoadShop.Domain/HighLoadShop.Domain.csproj" />
+  <Project Path="HighLoadShop.Application/HighLoadShop.Application.csproj" />
+  <Project Path="HighLoadShop.Persistence/HighLoadShop.Persistence.csproj" />
+  <Project Path="HighLoadShop.Infrastructure/HighLoadShop.Infrastructure.csproj" />
+  <Project Path="HighLoadShopApi/HighLoadShop.Api.csproj" />
+</Solution>

@@ -1,0 +1,6 @@
+@HighLoadShopApi_HostAddress = http://localhost:5111
+
+GET {{HighLoadShopApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
