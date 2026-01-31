@@ -1,13 +1,13 @@
 
 using HighLoadShop.Application;
-using HighLoadShop.Infrastructure;
-using HighLoadShop.Persistence;
-using HighLoadShop.Application.OrderContext.Commands.CreateOrder;
-using HighLoadShop.Application.OrderContext.Commands.ConfirmOrder;
-using HighLoadShop.Application.OrderContext.Queries.GetOrder;
+using HighLoadShop.Application.Common.Interfaces;
 using HighLoadShop.Application.InventoryContext.Commands.ReserveInventory;
 using HighLoadShop.Application.InventoryContext.Queries.GetInventory;
-using MediatR;
+using HighLoadShop.Application.OrderContext.Commands.ConfirmOrder;
+using HighLoadShop.Application.OrderContext.Commands.CreateOrder;
+using HighLoadShop.Application.OrderContext.Queries.GetOrder;
+using HighLoadShop.Infrastructure;
+using HighLoadShop.Persistence;
 using Microsoft.AspNetCore.Mvc;
 
 namespace HighLoadShopApi
@@ -26,7 +26,6 @@ namespace HighLoadShopApi
             builder.Services.AddInfrastructure(builder.Configuration);
             builder.Services.AddPersistence(builder.Configuration);
 
-            // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
             var app = builder.Build();
@@ -47,32 +46,32 @@ namespace HighLoadShopApi
             // Order Context Endpoints
             var orders = v1.MapGroup("/orders").WithTags("Orders");
 
-            orders.MapPost("/", async ([FromBody] CreateOrderRequest request, IMediator mediator) =>
+            orders.MapPost("/", async ([FromBody] CreateOrderRequest request, IDispatcher dispatcher) =>
             {
                 var command = new CreateOrderCommand(request.UserId, request.Items);
-                var result = await mediator.Send(command);
+                var result = await dispatcher.SendAsync(command, CancellationToken.None);
 
-                return result.IsSuccess 
+                return result.IsSuccess
                     ? Results.Created($"/api/v1/orders/{result.Value}", new { OrderId = result.Value })
                     : Results.BadRequest(result.Error);
             });
 
-            orders.MapGet("/{orderId:guid}", async (Guid orderId, IMediator mediator) =>
+            orders.MapGet("/{orderId:guid}", async (Guid orderId, IDispatcher dispatcher) =>
             {
                 var query = new GetOrderQuery(orderId);
-                var result = await mediator.Send(query);
+                var result = await dispatcher.SendAsync(query, CancellationToken.None);
 
-                return result.IsSuccess 
+                return result.IsSuccess
                     ? Results.Ok(result.Value)
                     : Results.NotFound(result.Error);
             });
 
-            orders.MapPost("/{orderId:guid}/confirm", async (Guid orderId, IMediator mediator) =>
+            orders.MapPost("/{orderId:guid}/confirm", async (Guid orderId, IDispatcher dispatcher) =>
             {
                 var command = new ConfirmOrderCommand(orderId);
-                var result = await mediator.Send(command);
+                var result = await dispatcher.SendAsync(command, CancellationToken.None);
 
-                return result.IsSuccess 
+                return result.IsSuccess
                     ? Results.Ok()
                     : Results.BadRequest(result.Error);
             });
@@ -80,22 +79,22 @@ namespace HighLoadShopApi
             // Inventory Context Endpoints
             var inventory = v1.MapGroup("/inventory").WithTags("Inventory");
 
-            inventory.MapGet("/{productId:guid}", async (Guid productId, IMediator mediator) =>
+            inventory.MapGet("/{productId:guid}", async (Guid productId, IDispatcher dispatcher) =>
             {
                 var query = new GetInventoryQuery(productId);
-                var result = await mediator.Send(query);
+                var result = await dispatcher.SendAsync(query, CancellationToken.None);
 
-                return result.IsSuccess 
+                return result.IsSuccess
                     ? Results.Ok(result.Value)
                     : Results.NotFound(result.Error);
             });
 
-            inventory.MapPost("/reserve", async ([FromBody] ReserveInventoryRequest request, IMediator mediator) =>
+            inventory.MapPost("/reserve", async ([FromBody] ReserveInventoryRequest request, IDispatcher dispatcher) =>
             {
                 var command = new ReserveInventoryCommand(request.OrderId, request.Items);
-                var result = await mediator.Send(command);
+                var result = await dispatcher.SendAsync(command, CancellationToken.None);
 
-                return result.IsSuccess 
+                return result.IsSuccess
                     ? Results.Ok()
                     : Results.BadRequest(result.Error);
             });

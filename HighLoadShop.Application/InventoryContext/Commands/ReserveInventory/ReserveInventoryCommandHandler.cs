@@ -1,5 +1,6 @@
 using HighLoadShop.Application.Common.Interfaces;
 using HighLoadShop.Application.Common.Models;
+using HighLoadShop.Application.InventoryContext.Interfaces;
 using HighLoadShop.Domain.InventoryContext.Entities;
 
 namespace HighLoadShop.Application.InventoryContext.Commands.ReserveInventory;
@@ -13,7 +14,7 @@ public class ReserveInventoryCommandHandler : ICommandHandler<ReserveInventoryCo
         _inventoryRepository = inventoryRepository;
     }
 
-    public async Task<Result> Handle(ReserveInventoryCommand request, CancellationToken cancellationToken)
+    public async Task<Result> HandleAsync(ReserveInventoryCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -55,14 +56,4 @@ public class ReserveInventoryCommandHandler : ICommandHandler<ReserveInventoryCo
             return Result.Failure(ex.Message);
         }
     }
-}
-
-public interface IInventoryRepository
-{
-    Task<InventoryItem?> GetByProductIdAsync(Guid productId, CancellationToken cancellationToken = default);
-    Task AddAsync(InventoryItem inventoryItem, CancellationToken cancellationToken = default);
-    Task UpdateAsync(InventoryItem inventoryItem, CancellationToken cancellationToken = default);
-    Task<Reservation?> GetReservationByIdAsync(Guid reservationId, CancellationToken cancellationToken = default);
-    Task AddReservationAsync(Reservation reservation, CancellationToken cancellationToken = default);
-    Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

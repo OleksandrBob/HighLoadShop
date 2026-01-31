@@ -1,6 +1,6 @@
 using HighLoadShop.Application.Common.Interfaces;
 using HighLoadShop.Application.Common.Models;
-using HighLoadShop.Application.OrderContext.Commands.CreateOrder;
+using HighLoadShop.Application.OrderContext.Interfaces;
 
 namespace HighLoadShop.Application.OrderContext.Commands.ConfirmOrder;
 
@@ -13,12 +13,12 @@ public class ConfirmOrderCommandHandler : ICommandHandler<ConfirmOrderCommand, R
         _orderRepository = orderRepository;
     }
 
-    public async Task<Result> Handle(ConfirmOrderCommand request, CancellationToken cancellationToken)
+    public async Task<Result> HandleAsync(ConfirmOrderCommand request, CancellationToken cancellationToken)
     {
         try
         {
             var order = await _orderRepository.GetByIdAsync(request.OrderId, cancellationToken);
-            if (order == null)
+            if (order is null)
                 return Result.Failure("Order not found");
 
             order.Confirm();

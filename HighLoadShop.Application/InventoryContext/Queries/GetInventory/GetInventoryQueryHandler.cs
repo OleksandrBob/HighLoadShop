@@ -1,6 +1,6 @@
 using HighLoadShop.Application.Common.Interfaces;
 using HighLoadShop.Application.Common.Models;
-using HighLoadShop.Application.InventoryContext.Commands.ReserveInventory;
+using HighLoadShop.Application.InventoryContext.Interfaces;
 
 namespace HighLoadShop.Application.InventoryContext.Queries.GetInventory;
 
@@ -13,7 +13,7 @@ public class GetInventoryQueryHandler : IQueryHandler<GetInventoryQuery, Result<
         _inventoryRepository = inventoryRepository;
     }
 
-    public async Task<Result<InventoryDto>> Handle(GetInventoryQuery request, CancellationToken cancellationToken)
+    public async Task<Result<InventoryDto>> HandleAsync(GetInventoryQuery request, CancellationToken cancellationToken)
     {
         try
         {

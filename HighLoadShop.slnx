@@ -3,5 +3,5 @@
   <Project Path="HighLoadShop.Application/HighLoadShop.Application.csproj" />
   <Project Path="HighLoadShop.Persistence/HighLoadShop.Persistence.csproj" />
   <Project Path="HighLoadShop.Infrastructure/HighLoadShop.Infrastructure.csproj" />
-  <Project Path="HighLoadShopApi/HighLoadShop.Api.csproj" />
+  <Project Path="HighLoadShop.Api/HighLoadShop.Api.csproj" />
 </Solution>
