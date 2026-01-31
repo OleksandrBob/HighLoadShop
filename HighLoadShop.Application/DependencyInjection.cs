@@ -18,7 +18,7 @@ public static class DependencyInjection
 
     private static IServiceCollection AddHandlers(this IServiceCollection services)
     {
-        var handlerInterface = typeof(ICommandHandler<,>);
+        var handlerInterface = typeof(IRequestHandler<,>);
 
         var handlers = Assembly.GetExecutingAssembly().GetTypes()
             .Where(t => !t.IsAbstract && !t.IsInterface)
