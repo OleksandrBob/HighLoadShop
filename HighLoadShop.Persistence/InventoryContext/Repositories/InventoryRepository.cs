@@ -1,4 +1,4 @@
-using HighLoadShop.Application.InventoryContext.Commands.ReserveInventory;
+using HighLoadShop.Application.InventoryContext.Interfaces;
 using HighLoadShop.Domain.InventoryContext.Entities;
 using Microsoft.EntityFrameworkCore;
 

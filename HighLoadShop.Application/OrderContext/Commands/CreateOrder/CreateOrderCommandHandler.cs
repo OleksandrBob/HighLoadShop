@@ -1,5 +1,6 @@
 using HighLoadShop.Application.Common.Interfaces;
 using HighLoadShop.Application.Common.Models;
+using HighLoadShop.Application.OrderContext.Interfaces;
 using HighLoadShop.Domain.OrderContext.Entities;
 
 namespace HighLoadShop.Application.OrderContext.Commands.CreateOrder;
@@ -13,7 +14,7 @@ public class CreateOrderCommandHandler : ICommandHandler<CreateOrderCommand, Res
         _orderRepository = orderRepository;
     }
 
-    public async Task<Result<Guid>> Handle(CreateOrderCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Guid>> HandleAsync(CreateOrderCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -35,13 +36,4 @@ public class CreateOrderCommandHandler : ICommandHandler<CreateOrderCommand, Res
             return Result.Failure<Guid>(ex.Message);
         }
     }
-}
-
-public interface IOrderRepository
-{
-    Task<Order?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default);
-    Task<List<Order>> GetByUserIdAsync(Guid userId, CancellationToken cancellationToken = default);
-    Task AddAsync(Order order, CancellationToken cancellationToken = default);
-    Task UpdateAsync(Order order, CancellationToken cancellationToken = default);
-    Task SaveChangesAsync(CancellationToken cancellationToken = default);
 }

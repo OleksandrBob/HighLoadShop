@@ -1,5 +1,5 @@
-using HighLoadShop.Application.InventoryContext.Commands.ReserveInventory;
-using HighLoadShop.Application.OrderContext.Commands.CreateOrder;
+using HighLoadShop.Application.InventoryContext.Interfaces;
+using HighLoadShop.Application.OrderContext.Interfaces;
 using HighLoadShop.Persistence.InventoryContext;
 using HighLoadShop.Persistence.InventoryContext.Repositories;
 using HighLoadShop.Persistence.OrderContext;

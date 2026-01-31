@@ -1,6 +1,6 @@
 using HighLoadShop.Application.Common.Interfaces;
 using HighLoadShop.Application.Common.Models;
-using HighLoadShop.Application.OrderContext.Commands.CreateOrder;
+using HighLoadShop.Application.OrderContext.Interfaces;
 
 namespace HighLoadShop.Application.OrderContext.Queries.GetOrder;
 
@@ -13,7 +13,7 @@ public class GetOrderQueryHandler : IQueryHandler<GetOrderQuery, Result<OrderDto
         _orderRepository = orderRepository;
     }
 
-    public async Task<Result<OrderDto>> Handle(GetOrderQuery request, CancellationToken cancellationToken)
+    public async Task<Result<OrderDto>> HandleAsync(GetOrderQuery request, CancellationToken cancellationToken)
     {
         try
         {
