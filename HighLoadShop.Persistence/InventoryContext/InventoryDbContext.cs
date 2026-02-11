@@ -16,7 +16,6 @@ public class InventoryDbContext : DbContext
     {
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(InventoryDbContext).Assembly);
         
-        // Configure InventoryItem entity
         modelBuilder.Entity<InventoryItem>(entity =>
         {
             entity.HasKey(e => e.Id);
@@ -27,7 +26,6 @@ public class InventoryDbContext : DbContext
             entity.HasIndex(e => e.ProductId).IsUnique();
         });
 
-        // Configure Reservation entity
         modelBuilder.Entity<Reservation>(entity =>
         {
             entity.HasKey(e => e.Id);
