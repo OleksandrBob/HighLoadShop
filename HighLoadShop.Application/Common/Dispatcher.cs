@@ -22,6 +22,6 @@ public class Dispatcher(IServiceProvider serviceProvider) : IDispatcher
 
         dynamic handler = serviceProvider.GetRequiredService(handlerType);
 
-        return handler.HandleAsync((dynamic)request, cancellationToken);
+        return await handler.HandleAsync((dynamic)request, cancellationToken);
     }
 }
