@@ -19,20 +19,38 @@ services:
       retries: 5
       start_period: 30s
 
-  api:
+  orderservice:
     build:
-      context: .
+      context: ./services/OrderService
       dockerfile: Dockerfile
-    container_name: highloadshop-api
+    container_name: highloadshop-orderservice
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://+:8080
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=
+      - ASPNETCORE_URLS=http://+:8081
       - ConnectionStrings__OrderDatabase=Data Source=sqlserver;Initial Catalog=HighLoadShop_Orders;User ID=sa;Password=YourStrong!Passw0rd;Persist Security Info=False;Pooling=True;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=True;Command Timeout=30
-      - ConnectionStrings__InventoryDatabase=Data Source=sqlserver;Initial Catalog=HighLoadShop_Inventory;User ID=sa;Password=YourStrong!Passw0rd;Persist Security Info=False;Pooling=True;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=True;Command Timeout=30    
+      - InventoryService__BaseUrl=http://inventoryservice:8082
     ports:
-      - "5000:8080"
+      - "5001:8081"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+      inventoryservice:
+        condition: service_started
+    networks:
+      - highloadshop-network
+    restart: unless-stopped
+
+  inventoryservice:
+    build:
+      context: ./services/InventoryService
+      dockerfile: Dockerfile
+    container_name: highloadshop-inventoryservice
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8082
+      - ConnectionStrings__InventoryDatabase=Data Source=sqlserver;Initial Catalog=HighLoadShop_Inventory;User ID=sa;Password=YourStrong!Passw0rd;Persist Security Info=False;Pooling=True;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=True;Command Timeout=30
+    ports:
+      - "5002:8082"
     depends_on:
       sqlserver:
         condition: service_healthy
