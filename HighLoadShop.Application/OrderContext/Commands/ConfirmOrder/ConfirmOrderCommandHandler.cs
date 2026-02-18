@@ -22,8 +22,8 @@ public class ConfirmOrderCommandHandler : ICommandHandler<ConfirmOrderCommand, R
                 return Result.Failure("Order not found");
 
             order.Confirm();
-            
-            await _orderRepository.UpdateAsync(order, cancellationToken);
+
+            _orderRepository.Update(order);
             await _orderRepository.SaveChangesAsync(cancellationToken);
 
             return Result.Success();

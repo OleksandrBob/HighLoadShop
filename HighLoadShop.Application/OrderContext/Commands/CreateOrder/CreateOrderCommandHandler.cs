@@ -26,7 +26,7 @@ public class CreateOrderCommandHandler : ICommandHandler<CreateOrderCommand, Res
                 order.AddOrderItem(item.ProductId, item.Quantity);
             }
 
-            await _orderRepository.AddAsync(order, cancellationToken);
+            _orderRepository.Add(order);
             await _orderRepository.SaveChangesAsync(cancellationToken);
 
             return Result.Success(orderId);

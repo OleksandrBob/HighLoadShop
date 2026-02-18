@@ -29,15 +29,14 @@ public class OrderRepository : IOrderRepository
             .ToListAsync(cancellationToken);
     }
 
-    public async Task AddAsync(Order order, CancellationToken cancellationToken = default)
+    public void Add(Order order)
     {
-        await _context.Orders.AddAsync(order, cancellationToken);
+        _context.Orders.Add(order);
     }
 
-    public Task UpdateAsync(Order order, CancellationToken cancellationToken = default)
+    public void Update(Order order)
     {
         _context.Orders.Update(order);
-        return Task.CompletedTask;
     }
 
     public async Task SaveChangesAsync(CancellationToken cancellationToken = default)

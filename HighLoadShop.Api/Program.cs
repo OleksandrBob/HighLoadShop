@@ -11,6 +11,8 @@ namespace HighLoadShopApi
         {
             var builder = WebApplication.CreateBuilder(args);
 
+            builder.Configuration.AddEnvironmentVariables();
+
             builder.Services.AddControllers(options =>
             {
                 // Add global filters if needed
@@ -35,7 +37,7 @@ namespace HighLoadShopApi
                 app.MapOpenApi();
             }
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseAuthorization();
 

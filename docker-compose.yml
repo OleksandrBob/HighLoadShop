@@ -1,0 +1,48 @@
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: highloadshop-sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStrong!Passw0rd
+      - MSSQL_PID=Developer
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserver_data:/var/opt/mssql
+    networks:
+      - highloadshop-network
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P YourStrong!Passw0rd -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: highloadshop-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ASPNETCORE_HTTPS_PORTS=
+      - ConnectionStrings__OrderDatabase=Data Source=sqlserver;Initial Catalog=HighLoadShop_Orders;User ID=sa;Password=YourStrong!Passw0rd;Persist Security Info=False;Pooling=True;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=True;Command Timeout=30
+      - ConnectionStrings__InventoryDatabase=Data Source=sqlserver;Initial Catalog=HighLoadShop_Inventory;User ID=sa;Password=YourStrong!Passw0rd;Persist Security Info=False;Pooling=True;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=True;Command Timeout=30    
+    ports:
+      - "5000:8080"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    networks:
+      - highloadshop-network
+    restart: unless-stopped
+
+networks:
+  highloadshop-network:
+    driver: bridge
+
+volumes:
+  sqlserver_data:
