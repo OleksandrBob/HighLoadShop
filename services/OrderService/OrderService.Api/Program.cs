@@ -6,7 +6,7 @@ namespace OrderService.Api;
 
 public class Program
 {
-    public static void Main(string[] args)
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +35,16 @@ public class Program
         app.UseAuthorization();
 
         app.MapControllers();
+
+        app.MapControllers();
+
+        using (var scope = app.Services.CreateScope())
+        {
+            var dbContext = scope.ServiceProvider.GetRequiredService<OrderDbContext>();
+            var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+            await AppMigrator.MigrateDatabase(dbContext, logger);
+        }
 
         app.Run();
     }

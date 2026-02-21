@@ -27,7 +27,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8081
-      - ConnectionStrings__OrderDatabase=Data Source=sqlserver;Initial Catalog=HighLoadShop_Orders;User ID=sa;Password=YourStrong!Passw0rd;Persist Security Info=False;Pooling=True;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=True;Command Timeout=30
+      - ConnectionStrings__OrderDatabase=${OrderDatabaseConnectionString}
       - InventoryService__BaseUrl=http://inventoryservice:8082
     ports:
       - "5001:8081"
@@ -48,7 +48,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8082
-      - ConnectionStrings__InventoryDatabase=Data Source=sqlserver;Initial Catalog=HighLoadShop_Inventory;User ID=sa;Password=YourStrong!Passw0rd;Persist Security Info=False;Pooling=True;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=True;Command Timeout=30
+      - ConnectionStrings__InventoryDatabase=${InventoryDatabaseConnectionString}
     ports:
       - "5002:8082"
     depends_on:
