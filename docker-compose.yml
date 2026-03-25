@@ -4,8 +4,8 @@ services:
     container_name: highloadshop-sqlserver
     environment:
       - ACCEPT_EULA=Y
-      - MSSQL_SA_PASSWORD=YourStrong!Passw0rd
       - MSSQL_PID=Developer
+      - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD}
     ports:
       - "1433:1433"
     volumes:
@@ -19,6 +19,55 @@ services:
       retries: 5
       start_period: 30s
 
+  loki:
+    image: grafana/loki:latest
+    container_name: highloadshop-loki
+    user: "0"
+    volumes:
+      - ./otel-config/loki-config.yaml:/etc/loki/local-config.yaml
+      - loki_data:/loki
+    ports:
+      - "3100:3100"
+    environment:
+      - GOGC=80
+    networks:
+      - highloadshop-network
+    command: -config.file=/etc/loki/local-config.yaml -config.expand-env=true
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: highloadshop-grafana
+    user: "0"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASS}
+      - GF_INSTALL_PLUGINS=grafana-clock-panel
+    volumes:
+      - grafana_data:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    depends_on:
+      - loki
+    networks:
+      - highloadshop-network
+    restart: unless-stopped
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib
+    container_name: highloadshop-otel-collector
+    user: "0"
+    volumes:
+      - ./otel-config/otelcol-config.yaml:/etc/otelcol-contrib/config.yaml
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+    environment:
+      - GOGC=80
+    depends_on:
+      - loki
+    networks:
+      - highloadshop-network
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+
   orderservice:
     build:
       context: ./services/OrderService
@@ -29,11 +78,16 @@ services:
       - ASPNETCORE_URLS=http://+:8081
       - ConnectionStrings__OrderDatabase=${OrderDatabaseConnectionString}
       - InventoryService__BaseUrl=http://inventoryservice:8082
+      - OpenTelemetry__ServiceName=OrderService
+      - OpenTelemetry__ServiceVersion=1.0.0
+      - OpenTelemetry__Endpoint=${OpenTelemetryConnectionString}
     ports:
       - "5001:8081"
     depends_on:
       sqlserver:
         condition: service_healthy
+      otel-collector:
+        condition: service_started
       inventoryservice:
         condition: service_started
     networks:
@@ -49,11 +103,16 @@ services:
       - ASPNETCORE_ENVIRONMENT=Production
       - ASPNETCORE_URLS=http://+:8082
       - ConnectionStrings__InventoryDatabase=${InventoryDatabaseConnectionString}
+      - OpenTelemetry__ServiceName=InventoryService
+      - OpenTelemetry__ServiceVersion=1.0.0
+      - OpenTelemetry__Endpoint=${OpenTelemetryConnectionString}
     ports:
       - "5002:8082"
     depends_on:
       sqlserver:
         condition: service_healthy
+      otel-collector:
+        condition: service_started
     networks:
       - highloadshop-network
     restart: unless-stopped
@@ -64,3 +123,5 @@ networks:
 
 volumes:
   sqlserver_data:
+  loki_data:
+  grafana_data:

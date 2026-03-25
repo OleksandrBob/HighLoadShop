@@ -2,5 +2,6 @@
   <Project Path="OrderService.Api/OrderService.Api.csproj" />
   <Project Path="OrderService.Domain/OrderService.Domain.csproj" />
   <Project Path="OrderService.Application/OrderService.Application.csproj" />
+  <Project Path="OrderService.Infrastructure/OrderService.Infrastructure.csproj" />
   <Project Path="OrderService.Persistence/OrderService.Persistence.csproj" />
 </Solution>

@@ -1,5 +1,6 @@
 using FluentValidation;
 using OrderService.Application;
+using OrderService.Infrastructure;
 using OrderService.Persistence;
 
 namespace OrderService.Api;
@@ -16,6 +17,7 @@ public class Program
 
         builder.Services.AddAuthorization();
 
+        builder.AddInfrastructure();
         builder.Services.AddApplication();
         builder.Services.AddPersistence(builder.Configuration);
 
