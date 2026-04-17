@@ -7,6 +7,11 @@ server:
 limits_config:
   allow_structured_metadata: true
   volume_enabled: true
+  otlp_config:
+    log_attributes:
+      - action: index_label
+        attributes:
+          - endpoint
 
 common:
   instance_addr: 0.0.0.0

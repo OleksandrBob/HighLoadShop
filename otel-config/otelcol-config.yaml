@@ -11,6 +11,15 @@ extensions:
     directory: /etc/otelcol-contrib/.data/storage/
     create_directory: true
 
+processors:
+  attributes:
+    actions:
+      - key: endpoint
+        action: upsert
+        from_attribute: ActionName
+  resourcedetection:
+    detectors: ["system"]
+
 exporters:
   otlp_http:
     endpoint: http://loki:3100/otlp
@@ -20,5 +29,5 @@ service:
   pipelines:
     logs:
       receivers: [otlp]
-      processors: []
+      processors: [attributes, resourcedetection]
       exporters: [otlp_http]
