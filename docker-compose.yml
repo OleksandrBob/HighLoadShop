@@ -1,4 +1,54 @@
 services:
+
+  # loki:
+  #   image: grafana/loki:latest
+  #   container_name: highloadshop-loki
+  #   user: "0"
+  #   volumes:
+  #     - ./otel-config/loki-config.yaml:/etc/loki/local-config.yaml
+  #     - loki_data:/loki
+  #   ports:
+  #     - "3100:3100"
+  #   environment:
+  #     - GOGC=80
+  #   networks:
+  #     - highloadshop-network
+  #   command: -config.file=/etc/loki/local-config.yaml -config.expand-env=true
+
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   container_name: highloadshop-grafana
+  #   user: "0"
+  #   environment:
+  #     - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASS}
+  #     - GF_INSTALL_PLUGINS=grafana-clock-panel
+  #   volumes:
+  #     - grafana_data:/var/lib/grafana
+  #   ports:
+  #     - "3000:3000"
+  #   depends_on:
+  #     - loki
+  #   networks:
+  #     - highloadshop-network
+  #   restart: unless-stopped
+
+  # otel-collector:
+  #   image: otel/opentelemetry-collector-contrib
+  #   container_name: highloadshop-otel-collector
+  #   user: "0"
+  #   volumes:
+  #     - ./otel-config/otelcol-config.yaml:/etc/otelcol-contrib/config.yaml
+  #   ports:
+  #     - "4317:4317"
+  #     - "4318:4318"
+  #   environment:
+  #     - GOGC=80
+  #   depends_on:
+  #     - loki
+  #   networks:
+  #     - highloadshop-network
+  #   command: ["--config=/etc/otelcol-contrib/config.yaml"]
+
   sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: highloadshop-sqlserver
@@ -19,55 +69,6 @@ services:
       retries: 5
       start_period: 30s
 
-  loki:
-    image: grafana/loki:latest
-    container_name: highloadshop-loki
-    user: "0"
-    volumes:
-      - ./otel-config/loki-config.yaml:/etc/loki/local-config.yaml
-      - loki_data:/loki
-    ports:
-      - "3100:3100"
-    environment:
-      - GOGC=80
-    networks:
-      - highloadshop-network
-    command: -config.file=/etc/loki/local-config.yaml -config.expand-env=true
-
-  grafana:
-    image: grafana/grafana:latest
-    container_name: highloadshop-grafana
-    user: "0"
-    environment:
-      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASS}
-      - GF_INSTALL_PLUGINS=grafana-clock-panel
-    volumes:
-      - grafana_data:/var/lib/grafana
-    ports:
-      - "3000:3000"
-    depends_on:
-      - loki
-    networks:
-      - highloadshop-network
-    restart: unless-stopped
-
-  otel-collector:
-    image: otel/opentelemetry-collector-contrib
-    container_name: highloadshop-otel-collector
-    user: "0"
-    volumes:
-      - ./otel-config/otelcol-config.yaml:/etc/otelcol-contrib/config.yaml
-    ports:
-      - "4317:4317"
-      - "4318:4318"
-    environment:
-      - GOGC=80
-    depends_on:
-      - loki
-    networks:
-      - highloadshop-network
-    command: ["--config=/etc/otelcol-contrib/config.yaml"]
-
   orderservice:
     build:
       context: ./services/OrderService
@@ -86,8 +87,8 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
-      otel-collector:
-        condition: service_started
+      # otel-collector:
+      #   condition: service_started
       inventoryservice:
         condition: service_started
     networks:
@@ -111,8 +112,35 @@ services:
     depends_on:
       sqlserver:
         condition: service_healthy
-      otel-collector:
-        condition: service_started
+      # otel-collector:
+      #   condition: service_started
+    networks:
+      - highloadshop-network
+    restart: unless-stopped
+
+  userservice:
+    build:
+      context: ./services/UserService
+      dockerfile: Dockerfile
+    container_name: highloadshop-userservice
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8083
+      - ConnectionStrings__UserDatabase=${UserDatabaseConnectionString}
+      - Auth0__Domain=${Auth0Domain}
+      - Auth0__Audience=${Auth0Audience}
+      - Jwt__Issuer=UserService
+      - Jwt__Audience=HighLoadShop
+      - Jwt__SigningKey=${UserServiceJwtSigningKey:-change-this-signing-key-for-container-runs}
+      - Jwt__ExpirationMinutes=60
+      - OpenTelemetry__ServiceName=UserService
+      - OpenTelemetry__ServiceVersion=1.0.0
+      - OpenTelemetry__Endpoint=${OpenTelemetryConnectionString}
+    ports:
+      - "5003:8083"
+    depends_on:
+      sqlserver:
+        condition: service_healthy
     networks:
       - highloadshop-network
     restart: unless-stopped
