@@ -128,7 +128,11 @@ services:
       - ASPNETCORE_URLS=http://+:8083
       - ConnectionStrings__UserDatabase=${UserDatabaseConnectionString}
       - Auth0__Domain=${Auth0Domain}
+      - Auth0__ClientId=${Auth0ClientId}
+      - Auth0__ClientSecret=${Auth0ClientSecret}
+      - Auth0__Connection=${Auth0Connection}
       - Auth0__Audience=${Auth0Audience}
+      - Auth0__IdTokenSigningAlgorithm=RS256
       - Jwt__Issuer=UserService
       - Jwt__Audience=HighLoadShop
       - Jwt__SigningKey=${UserServiceJwtSigningKey:-change-this-signing-key-for-container-runs}
