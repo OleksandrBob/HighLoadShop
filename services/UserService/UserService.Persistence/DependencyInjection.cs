@@ -10,7 +10,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddDbContext<UserDbContext>(options =>
+        // Context Database
+        services.AddDbContextFactory<UserDbContext>(options =>
             options.UseSqlServer(
                 configuration.GetConnectionString("UserDatabase"),
                 b => b.MigrationsAssembly(typeof(UserDbContext).Assembly.FullName)));

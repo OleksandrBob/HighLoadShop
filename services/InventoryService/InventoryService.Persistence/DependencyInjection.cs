@@ -10,8 +10,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
     {
-        // Inventory Context Database
-        services.AddDbContext<InventoryDbContext>(options =>
+        // Context Database
+        services.AddDbContextFactory<InventoryDbContext>(options =>
             options.UseSqlServer(
                 configuration.GetConnectionString("InventoryDatabase"),
                 b => b.MigrationsAssembly(typeof(InventoryDbContext).Assembly.FullName)));
