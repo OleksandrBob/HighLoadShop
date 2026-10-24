@@ -10,8 +10,8 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddPersistence(this IServiceCollection services, IConfiguration configuration)
     {
-        // Order Context Database
-        services.AddDbContext<OrderDbContext>(options =>
+        // Context Database
+        services.AddDbContextFactory<OrderDbContext>(options =>
             options.UseSqlServer(
                 configuration.GetConnectionString("OrderDatabase"),
                 b => b.MigrationsAssembly(typeof(OrderDbContext).Assembly.FullName)));
