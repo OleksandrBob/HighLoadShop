@@ -12,6 +12,7 @@ public class Order : AggregateRoot<Guid>
     public OrderStatus Status { get; private set; }
     public DateTime ReservedUntil { get; private set; }
     public DateTime CreatedAt { get; private set; }
+    public byte[] RowVersion { get; private set; } = null!;
 
     private Order() { }
 

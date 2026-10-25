@@ -1,4 +1,3 @@
-using System.Data;
 using OrderService.Application.Common.Interfaces;
 using OrderService.Application.Common.Models;
 using OrderService.Application.Interfaces;
@@ -18,10 +17,6 @@ public class CancelOrderCommandHandler : ICommandHandler<CancelOrderCommand, Res
 
     public async Task<Result> HandleAsync(CancelOrderCommand request, CancellationToken cancellationToken)
     {
-        await using var transaction = await _unitOfWork.BeginTransactionAsync(
-            IsolationLevel.RepeatableRead,
-            cancellationToken);
-
         try
         {
             var order = await _orderRepository.GetByIdAsync(request.OrderId, cancellationToken);
@@ -30,16 +25,14 @@ public class CancelOrderCommandHandler : ICommandHandler<CancelOrderCommand, Res
 
             order.Cancel();
             _orderRepository.Update(order);
+            await Task.Delay(1400);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
-            await transaction.CommitAsync(cancellationToken);
 
             return Result.Success();
         }
         catch (Exception ex)
         {
-            await transaction.RollbackAsync(CancellationToken.None);
-
             return Result.Failure(ex.Message);
         }
     }
