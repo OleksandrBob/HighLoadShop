@@ -8,6 +8,7 @@ namespace OrderService.Application.Commands.CreateOrder;
 
 public class CreateOrderCommandHandler(
         IOrderRepository orderRepository,
+            IUnitOfWork unitOfWork,
             ILogger<CreateOrderCommandHandler> logger) : ICommandHandler<CreateOrderCommand, Result<Guid>>
 {
     public async Task<Result<Guid>> HandleAsync(CreateOrderCommand request, CancellationToken cancellationToken)
@@ -26,7 +27,7 @@ public class CreateOrderCommandHandler(
             logger.LogWarning("warn {@a}", 2);
 
             orderRepository.Add(order);
-            await orderRepository.SaveChangesAsync(cancellationToken);
+            await unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Reserve inventory via HTTP call to InventoryService
             //var reserveResult = await _inventoryServiceClient.ReserveInventoryAsync(
@@ -38,7 +39,7 @@ public class CreateOrderCommandHandler(
             //{
             //    // If inventory reservation fails, cancel the order
             //    order.Cancel();
-            //    await _orderRepository.SaveChangesAsync(cancellationToken);
+            //    await unitOfWork.SaveChangesAsync(cancellationToken);
             //    return Result.Failure<Guid>("Failed to reserve inventory");
             //}
 

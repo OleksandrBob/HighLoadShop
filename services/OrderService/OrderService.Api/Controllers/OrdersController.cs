@@ -1,7 +1,9 @@
 using OrderService.Api.Filters;
 using OrderService.Api.Models;
 using OrderService.Application.Common.Interfaces;
+using OrderService.Application.Commands.CancelOrder;
 using OrderService.Application.Commands.ConfirmOrder;
+using OrderService.Application.Commands.CompleteOrder;
 using OrderService.Application.Commands.CreateOrder;
 using OrderService.Application.Queries.GetOrder;
 using Microsoft.AspNetCore.Mvc;
@@ -68,6 +70,42 @@ public class OrdersController : ControllerBase
         CancellationToken cancellationToken)
     {
         var command = new ConfirmOrderCommand(orderId);
+        var result = await _dispatcher.SendAsync(command, cancellationToken);
+
+        return result.IsSuccess
+            ? Ok()
+            : BadRequest(result.Error);
+    }
+
+    /// <summary>
+    /// Completes an order
+    /// </summary>
+    [HttpPost("{orderId:guid}/complete")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CompleteOrder(
+        Guid orderId,
+        CancellationToken cancellationToken)
+    {
+        var command = new CompleteOrderCommand(orderId);
+        var result = await _dispatcher.SendAsync(command, cancellationToken);
+
+        return result.IsSuccess
+            ? Ok()
+            : BadRequest(result.Error);
+    }
+
+    /// <summary>
+    /// Cancels an order
+    /// </summary>
+    [HttpPost("{orderId:guid}/cancel")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> CancelOrder(
+        Guid orderId,
+        CancellationToken cancellationToken)
+    {
+        var command = new CancelOrderCommand(orderId);
         var result = await _dispatcher.SendAsync(command, cancellationToken);
 
         return result.IsSuccess
