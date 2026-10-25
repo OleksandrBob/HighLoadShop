@@ -29,7 +29,7 @@ public class Order : AggregateRoot<Guid>
             throw new InvalidOperationException("Cannot modify order items for non-pending orders");
 
         var existingItem = _orderItems.FirstOrDefault(x => x.ProductId == productId);
-        if (existingItem != null)
+        if (existingItem is not null)
         {
             existingItem.UpdateQuantity(existingItem.Quantity + quantity);
         }
@@ -45,7 +45,7 @@ public class Order : AggregateRoot<Guid>
             throw new InvalidOperationException("Cannot modify order items for non-pending orders");
 
         var item = _orderItems.FirstOrDefault(x => x.ProductId == productId);
-        if (item != null)
+        if (item is not null)
         {
             _orderItems.Remove(item);
         }
@@ -62,8 +62,8 @@ public class Order : AggregateRoot<Guid>
 
     public void Cancel()
     {
-        if (Status == OrderStatus.Completed || Status == OrderStatus.Cancelled)
-            throw new InvalidOperationException("Cannot cancel completed or already cancelled orders");
+        if (Status != OrderStatus.Confirmed)
+            throw new InvalidOperationException("Only confirmed orders can be cancelled");
 
         Status = OrderStatus.Cancelled;
         RaiseDomainEvent(new OrderCancelledDomainEvent(Id, _orderItems.ToList()));
