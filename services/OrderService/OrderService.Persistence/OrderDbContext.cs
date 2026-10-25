@@ -21,6 +21,7 @@ public class OrderDbContext : DbContext
             entity.Property(e => e.Status).IsRequired();
             entity.Property(e => e.ReservedUntil).IsRequired();
             entity.Property(e => e.CreatedAt).IsRequired();
+            entity.Property(e => e.RowVersion).IsRowVersion();
 
             entity.HasMany(e => e.OrderItems)
                   .WithOne()
