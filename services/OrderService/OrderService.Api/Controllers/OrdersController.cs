@@ -87,7 +87,6 @@ public class OrdersController : ControllerBase
         Guid orderId,
         CancellationToken cancellationToken)
     {
-        var testKey = "asdasd";
         var command = new CompleteOrderCommand(orderId);
         var result = await _dispatcher.SendAsync(command, cancellationToken);
 
