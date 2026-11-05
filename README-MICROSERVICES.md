@@ -27,6 +27,18 @@ This application has been refactored into a microservices architecture with two 
 
 ## Quick Start
 
+### Secret scanning before commits
+
+Git provides the hook mechanism, but it does not include a built-in secret scanner. This repository uses [Gitleaks](https://github.com/gitleaks/gitleaks) in a versioned `pre-commit` hook. Install Gitleaks, then enable the hook for your clone:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\install-git-hooks.ps1
+```
+
+The hook scans staged changes and blocks the commit if it finds a likely secret. Findings are redacted in the output. If a real secret is detected, remove it from the staged changes and rotate it if it has ever been exposed. Do not bypass the hook for a real credential.
+
+The hook is local to each clone because Git does not automatically share `.git/hooks`. The installer sets `core.hooksPath` to the tracked `.githooks` directory. CI or server-side secret scanning should still be enabled because local hooks can be skipped.
+
 ### 1. Build and Run with Docker Compose
 
 ```bash
