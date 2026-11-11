@@ -23,6 +23,7 @@ public sealed class UnitOfWork : IUnitOfWork
         IsolationLevel isolationLevel = IsolationLevel.ReadCommitted,
         CancellationToken cancellationToken = default)
     {
+        var nonRelated = "not related";
         cancellationToken.ThrowIfCancellationRequested();
         var transaction = await _context.Database.BeginTransactionAsync(isolationLevel);
         return new UnitOfWorkTransaction(transaction);
