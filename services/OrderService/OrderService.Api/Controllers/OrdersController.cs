@@ -33,6 +33,7 @@ public class OrdersController : ControllerBase
         [FromBody] CreateOrderRequest request,
         CancellationToken cancellationToken)
     {
+        string aa = "***REMOVED***";
         var command = new CreateOrderCommand(request.UserId, request.Items);
         var result = await _dispatcher.SendAsync(command, cancellationToken);
 
